@@ -1,1 +1,279 @@
-"Hello World" 
+<html>
+    <head>
+      <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta name="HandheldFriendly" content="true">
+      <title>PoikiloProjekti</title>
+      <link rel="stylesheet" href="./Leaflet-1.0.3/leaflet.css"/>
+
+      <link rel="stylesheet" href="./w3.css">
+      <link rel="stylesheet" href="./style.css"/>
+      <script src="./Leaflet-1.0.3/leaflet.js"></script>
+      <style>
+        #map{ height: 92.5% }
+
+        .center{  text-align: center;}
+
+      </style>
+    </head>
+    <body>
+
+      <nav style="background-color: #e2017b;">
+        <!-- Top panel -->
+        <img { max-width:200px } style="width: 200px;" src='./Images/poikilo.jpg'/>
+
+        <div style="display: inline-block ; width:150px" class="custom-select">
+          <select id="route">
+            <option value="0">Valitse kierros:</option>
+            <option value="1">Ravintolakierros</option>
+            <option value="2">Heikki Rautio</option>
+            <option value="3">Eero Suikki</option>
+          </select>
+        </div>
+
+        <div id="map"></div>
+
+        <div id="modal01" class="w3-modal w3-animate-zoom"  onclick="this.style.display='none'">
+          <div class="w3-container" style=" max-width: 800px; max-height: 600px;">
+            <img class="w3-modal-content responsive" id="img01" style="  width: auto; max-width: 100%; height: auto;" margin ="auto">
+          </div>
+        </div>
+
+        <div id="id01" class="w3-modal w3-center">
+          <div class="w3-modal-content w3-center">
+            <div class="w3-container w3-center">
+              <span onclick="document.getElementById('id01').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam neque asperiores sapiente! Culpa fugit quam ipsa reiciendis dolorum sunt vitae soluta incidunt eaque, in veniam minus consequuntur praesentium sit sapiente!</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Modi deserunt nihil non atque sapiente quaerat repellat ducimus, tempora quas nesciunt dolorem, reprehenderit recusandae mollitia dolorum tenetur laboriosam natus, numquam ratione!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </nav>
+
+      <script>
+ 
+
+      var Ravintolakierros = [[60.867923, 26.703646, "./Images/ravintolat/KMV54_19.jpg"], [60.867796, 26.698187, "./Images/ravintolat/KMV55_150.jpg"], [60.868252, 26.706370 , "./Images/ravintolat/sumppi.jpg"], [60.867920, 26.711996 , "./Images/ravintolat/KMV69176.jpg"], [60.867637, 26.699259 , "./Images/ravintolat/KoV172.jpg"]];
+
+      var HeikkiRautio = [[60.869526, 26.703611, "./HeikkiRautio/KMV54_1.jpg"], [60.869409, 26.703652, "./HeikkiRautio/KMV54_17.jpg"], [60.868643, 26.703761, "./HeikkiRautio/KMV54_21.jpg"], [60.868000, 26.698237, "./HeikkiRautio/KMV54_27.jpg"], [60.869623, 26.705653, "./HeikkiRautio/KMV54_30.jpg"],
+       [60.867271, 26.704504, "./HeikkiRautio/KMV54_34.jpg"], [60.867774, 26.701676, "./HeikkiRautio/KMV54_37.jpg"], [60.868066, 26.706206, "./HeikkiRautio/KMV54_38.jpg"], [60.868315, 26.708237, "./HeikkiRautio/KMV54_45.jpg"], [60.866055, 26.705073, "./HeikkiRautio/KMV54_64.jpg"],
+       [60.868546, 26.701514, "./HeikkiRautio/KMV54_95.jpg"], [60.868178, 26.697234, "./HeikkiRautio/KMV54_153.jpg"], [60.870560, 26.703301, "./HeikkiRautio/KMV54_208.jpg"], [60.867920, 26.704755, "./HeikkiRautio/KMV54_233.jpg"], [60.870763, 26.704682, "./HeikkiRautio/KMV54_240.jpg"]];
+
+      var EeroSuikki =  [[60.870754, 26.715100, "./EeroSuikki/KMV55_9.jpg"], [60.865961, 26.702852, "./EeroSuikki/KMV55_29.jpg"], [60.869168, 26.707257, "./EeroSuikki/KMV55_33.jpg"], [60.867571, 26.704315, "./EeroSuikki/KMV55_47.jpg"], [60.867813, 26.704040, "./EeroSuikki/KMV55_148.jpg"],
+       [60.870364, 26.704941, "./EeroSuikki/KMV55_151.jpg"], [60.869870, 26.701861, "./EeroSuikki/KMV55_157.jpg"], [60.869613, 26.707499, "./EeroSuikki/KMV55_270.jpg"], [60.870527, 26.708729, "./EeroSuikki/KMV55_275.jpg"], [60.867884, 26.704434, "./EeroSuikki/KMV55_352.jpg"],
+       [60.870661, 26.707532, "./EeroSuikki/KMV55_411.jpg"], [60.871653, 26.712159, "./EeroSuikki/KMV55_421.jpg"], [60.868705, 26.703775, "./EeroSuikki/KMV55_425.jpg"], [60.867062, 26.699694, "./EeroSuikki/KMV55_497.jpg"]];
+
+      var isShown = false;
+      var testilayer = [];
+
+      var map = L.map('map').setView([60.8679, 26.7042], 13);
+
+      var greenIcon = L.icon({
+          iconUrl: 'marker-icon-inactive.png',
+          shadowUrl: 'marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          tooltipAnchor: [16, -28],
+          shadowSize: [41, 41]
+      });
+        // Simple loop that combines gps and images into one and places them into the map
+      function showRavintola(){
+        if (!isShown) {
+          for (var i = 0; i < Ravintolakierros.length; i++) {
+            testilayer[i] = L.marker([Ravintolakierros[i][0], Ravintolakierros[i][1]]).addTo(map).bindPopup(`<img src='${Ravintolakierros[i][2]} 'test' width='360px''id ='img-${i}' onclick="onClick(this)" class="w3-hover-opacity w3-display-container";"/> 
+            <button id="octagon" class="w3-button w3-circle w3-black w3-display-topleft " onclick="document.getElementById('id01').style.display='block'">i</button>`, {maxWidth : 360 });
+          }
+        //}).addTo(map);
+        // map.addLayer(Ravintolakierros);
+        // L.marker([60.867923, 26.703646]).addTo(map)
+        //     .bindPopup("<img src='./Images/ravintolat/KMV54_19.jpg 'test' width='500px'/>", {maxWidth : 501 });
+        //
+        // L.marker([60.867796, 26.698187]).addTo(map)
+        //     .bindPopup("<img src='./Images/ravintolat/KMV55_150.jpg 'test' width='500px'/>", {maxWidth : 501 });
+        //
+        // L.marker([60.868252, 26.706370]).addTo(map)
+        //     .bindPopup("<img src='./Images/ravintolat/sumppi.jpg 'test' width='500px'/>", {maxWidth : 501 });
+        //
+        // L.marker([60.867920, 26.711996]).addTo(map)
+        //    .bindPopup("<img src='./Images/ravintolat/KMV69176.jpg 'test' width='500px'/>", {maxWidth : 501 });
+        //
+        // L.marker([60.867637, 26.699259]).addTo(map)
+        //   .bindPopup("<img src='./Images/ravintolat/KoV172.jpg 'test' width='500px'/>", {maxWidth : 501 });
+        isShown = true;
+      }}
+
+      function showSuikki(){
+        if (!isShown) {
+          for (var i = 0; i < EeroSuikki.length; i++) {
+            testilayer[i] = L.marker([EeroSuikki[i][0], EeroSuikki[i][1]]).addTo(map).bindPopup(`<img src='${EeroSuikki[i][2]}'test' width='360px''id = 'img-${i}' onclick="onClick(this)" class="w3-hover-opacity";" />`, {maxWidth : 360 });
+          }
+
+        isShown = true;
+      }}
+
+      function showMarkers(){
+        if (!isShown) {
+          for (var i = 0; i < HeikkiRautio.length; i++) {
+            testilayer[i] = L.marker([HeikkiRautio[i][0], HeikkiRautio[i][1]]).addTo(map).bindPopup(`<img src='${HeikkiRautio[i][2]}'test' width='360px''id = 'img-${i}' onclick="onClick(this)" class="w3-hover-opacity";" />`, {maxWidth : 360 });
+          }
+
+        isShown = true;
+        }
+      }
+      function checkSelection() {
+        var e = document.getElementById("route");
+        var value = e.options[e.selectedIndex].value;
+        var text = e.options[e.selectedIndex].text;
+
+        if (e.value == 1) {
+          disableMarkers()
+          showRavintola()
+        }
+        else if(e.value == 2){
+          disableMarkers()
+          showMarkers()
+        }
+        else if(e.value == 3){
+          disableMarkers()
+          showSuikki()
+        }
+      }
+
+
+      function onClick(element) {
+          document.getElementById("img01").src = element.src;
+          document.getElementById("modal01").style.display = "block";
+        }
+      // Loops trought all of the images and disables them
+      function disableMarkers(){
+        console.log ("kysgay")
+        isShown = false
+        for (var i = 0; i < testilayer.length; i++) {
+          testilayer[i].remove();
+        }
+
+          //map.removeLayer(Ravintolakierros);
+
+      }
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          maxZoom: 17,
+          minZoom: 9
+
+        }).addTo(map);
+
+        map.locate({setView: true, maxZoom: 16});
+
+
+        function largeImage(id) {
+          var img = document.getElementById("img-1");
+        }
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        //gps
+        function onLocationFound(e) {
+            var radius = e.accuracy;
+
+            L.marker(e.latlng).addTo(map)
+            .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+            L.circle(e.latlng, radius).addTo(map);
+
+        L.Control.textbox = L.Control.extend({
+		        onAdd: function(map) {
+
+		         var text = L.DomUtil.create('div');
+		         text.id = "info_text";
+		         text.innerHTML = "<strong>text here</strong>"
+		         return text;
+		         },
+	});
+	L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
+	L.control.textbox({ position: 'bottomleft' }).addTo(map);
+        }
+        map.on('locationfound', onLocationFound);
+
+
+        var x, i, j, selElmnt, a, b, c;
+          /*look for any elements with the class "custom-select":*/
+          x = document.getElementsByClassName("custom-select");
+          for (i = 0; i < x.length; i++) {
+            selElmnt = x[i].getElementsByTagName("select")[0];
+            /*for each element, create a new DIV that will act as the selected item:*/
+            a = document.createElement("DIV");
+            a.setAttribute("class", "select-selected");
+            a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+            x[i].appendChild(a);
+            /*for each element, create a new DIV that will contain the option list:*/
+            b = document.createElement("DIV");
+            b.setAttribute("class", "select-items select-hide");
+            for (j = 1; j < selElmnt.length; j++) {
+              /*for each option in the original select element,
+              create a new DIV that will act as an option item:*/
+              c = document.createElement("DIV");
+              c.innerHTML = selElmnt.options[j].innerHTML;
+              c.addEventListener("click", function(e) {
+                  /*when an item is clicked, update the original select box,
+                  and the selected item:*/
+                  var y, i, k, s, h;
+                  s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+                  h = this.parentNode.previousSibling;
+                  for (i = 0; i < s.length; i++) {
+                    if (s.options[i].innerHTML == this.innerHTML) {
+                      s.selectedIndex = i;
+                      h.innerHTML = this.innerHTML;
+                      y = this.parentNode.getElementsByClassName("same-as-selected");
+                      for (k = 0; k < y.length; k++) {
+                        y[k].removeAttribute("class");
+                      }
+                      this.setAttribute("class", "same-as-selected");
+                      break;
+                    }
+                  }
+                  h.click();
+              });
+              b.appendChild(c);
+            }
+            x[i].appendChild(b);
+            a.addEventListener("click", function(e) {
+                /*when the select box is clicked, close any other select boxes,
+                and open/close the current select box:*/
+                e.stopPropagation();
+                closeAllSelect(this);
+                this.nextSibling.classList.toggle("select-hide");
+                this.classList.toggle("select-arrow-active");
+                checkSelection()
+              });
+          }
+          function closeAllSelect(elmnt) {
+            /*a function that will close all select boxes in the document,
+            except the current select box:*/
+            var x, y, i, arrNo = [];
+            x = document.getElementsByClassName("select-items");
+            y = document.getElementsByClassName("select-selected");
+            for (i = 0; i < y.length; i++) {
+              if (elmnt == y[i]) {
+                arrNo.push(i)
+              } else {
+                y[i].classList.remove("select-arrow-active");
+              }
+            }
+            for (i = 0; i < x.length; i++) {
+              if (arrNo.indexOf(i)) {
+                x[i].classList.add("select-hide");
+              }
+            }
+          }
+          /*if the user clicks anywhere outside the select box,
+          then close all select boxes:*/
+          document.addEventListener("click", closeAllSelect);
+
+      </script>
+    </body>
+</html>
